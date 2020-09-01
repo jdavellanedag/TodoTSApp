@@ -1,13 +1,14 @@
 import { TodoItem } from './todoItem';
 import { TodoCollection } from './todoCollection';
 import * as inquerir from 'inquirer';
+import { JsonTodoCollection } from "./jsonTodoCollection";
 let todos = [
     new TodoItem(1, "Comprar regalos"),
     new TodoItem(2, "Cambiar zapatos"),
     new TodoItem(3, "Buscar tickets"),
     new TodoItem(4, "Llamar a Joe", true),
 ];
-let collection = new TodoCollection("Julian", todos);
+let collection: TodoCollection = new JsonTodoCollection("Julian", todos);
 let showCompleted = true;
 
 function displayToDoList(): void {
@@ -18,11 +19,13 @@ function displayToDoList(): void {
 
 enum Commands {
     Add = "Add new task",
+    Complete = "Complete Task",
     Toggle = "Show/Hide Completed",
+    Purge = "Remove Completed Tasks",
     Quit = "Quit",
 }
 
-function prompAdd(): void {
+function promptAdd(): void {
     console.clear();
     inquerir.prompt({
         type: "input",
@@ -32,6 +35,24 @@ function prompAdd(): void {
         if (answers["add"] !== ""){
             collection.addTodo(answers["add"]);
         }
+        promptUser();
+    })
+}
+
+function promptComplete(): void {
+    console.clear();
+    inquerir.prompt({
+        type: "checkbox",
+        name: "complete",
+        message: "Mark tasks complete",
+        choices: collection.getTodoItems(showCompleted).map(item => ({
+            name: item.task,
+            value: item.id,
+            checked: item.complete
+        }))
+    }).then( answers => {
+        let completedTasks = answers["complete"] as number[];
+        collection.getTodoItems(true).forEach(item => collection.markComplete(item.id, completedTasks.find(id => id === item.id) !== undefined));
         promptUser();
     })
 }
@@ -51,7 +72,18 @@ function promptUser(): void {
                 promptUser()
                 break;
             case Commands.Add:
-                prompAdd();
+                promptAdd();
+                break;
+            case Commands.Complete:
+                if (collection.getItemCounts().incomplete > 0){
+                    promptComplete();
+                } else {
+                    promptUser();
+                }
+                break;
+            case Commands.Purge:
+                collection.removeComplete();
+                promptUser();
                 break;
         }
     })

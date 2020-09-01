@@ -1,0 +1,29 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "task": "Comprar regalos",
+      "complete": true
+    },
+    {
+      "id": 2,
+      "task": "Cambiar zapatos",
+      "complete": false
+    },
+    {
+      "id": 3,
+      "task": "Buscar tickets",
+      "complete": false
+    },
+    {
+      "id": 4,
+      "task": "Llamar a Joe",
+      "complete": true
+    },
+    {
+      "id": 5,
+      "task": "Salir de compras",
+      "complete": false
+    }
+  ]
+}
